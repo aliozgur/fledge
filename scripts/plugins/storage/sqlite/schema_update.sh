@@ -97,14 +97,32 @@ db_upgrade()
                     schema_update_log "info" "Calling [${SQL_COMMAND}]" "logonly" "pretty"
                 fi
 
+                #// FIXME_I:
+                # Call the DB script
+#                COMMAND_OUTPUT=`${SQLITE_SQL} "${DEFAULT_SQLITE_DB_FILE}" 2>&1 <<EOF
+#ATTACH DATABASE '${DEFAULT_SQLITE_DB_FILE}'                 AS 'fledge';
+#ATTACH DATABASE '${DEFAULT_SQLITE_DB_FILE_READINGS}'        AS 'readings';
+#.read '${sql_file}'
+#.quit
+#EOF`
+
+                #// FIXME_I:
+                schema_update_log "err" ">> STage 1"
+
+                #// FIXME_I:
                 # Call the DB script
                 COMMAND_OUTPUT=`${SQLITE_SQL} "${DEFAULT_SQLITE_DB_FILE}" 2>&1 <<EOF
-ATTACH DATABASE '${DEFAULT_SQLITE_DB_FILE}'          AS 'fledge';
-ATTACH DATABASE '${DEFAULT_SQLITE_DB_FILE_READINGS}' AS 'readings';
+ATTACH DATABASE '${DEFAULT_SQLITE_DB_FILE}'              AS 'fledge';
+ATTACH DATABASE '${DEFAULT_SQLITE_DB_FILE_READINGS}'     AS 'readings_1';
+ATTACH DATABASE '${DEFAULT_SQLITE_DB_FILE_READINGS_SINGLE}' AS 'readings';
 .read '${sql_file}'
 .quit
 EOF`
                 RET_CODE=$?
+
+                #// FIXME_I:
+                schema_update_log "err" ">> STage 2"
+
                 if [ "${RET_CODE}" -ne 0 ]; then
                     schema_update_log "err" "Failure in upgrade command [${SQL_COMMAND}]: ${COMMAND_OUTPUT}. Exiting" "all" "pretty"
                     return 1
@@ -190,10 +208,19 @@ db_downgrade()
                     schema_update_log "info" "Calling [${SQL_COMMAND}]" "logonly" "pretty"
                 fi
 
+                #// FIXME_I:
+                # Call the DB script
+#                COMMAND_OUTPUT=`${SQLITE_SQL} "${DEFAULT_SQLITE_DB_FILE}" 2>&1 <<EOF
+#ATTACH DATABASE '${DEFAULT_SQLITE_DB_FILE}'                 AS 'fledge';
+#ATTACH DATABASE '${DEFAULT_SQLITE_DB_FILE_READINGS}'        AS 'readings';
+#.read '${sql_file}'
+#.quit
+#EOF`
                 # Call the DB script
                 COMMAND_OUTPUT=`${SQLITE_SQL} "${DEFAULT_SQLITE_DB_FILE}" 2>&1 <<EOF
-ATTACH DATABASE '${DEFAULT_SQLITE_DB_FILE}' AS 'fledge';
-ATTACH DATABASE '${DEFAULT_SQLITE_DB_FILE_READINGS}' AS 'readings';
+ATTACH DATABASE '${DEFAULT_SQLITE_DB_FILE}'                 AS 'fledge';
+ATTACH DATABASE '${DEFAULT_SQLITE_DB_FILE_READINGS}'        AS 'readings_1';
+ATTACH DATABASE '${DEFAULT_SQLITE_DB_FILE_READINGS_SINGLE}' AS 'readings';
 .read '${sql_file}'
 .quit
 EOF`
