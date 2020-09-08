@@ -1334,7 +1334,7 @@ string modifierInt;
 
 					//# FIXME_I:
 					char tmp_buffer[500000];
-					snprintf (tmp_buffer,500000, "DBG : queryExt |%s| ", queryExt);
+					snprintf (tmp_buffer,500000, "DBG 2 : queryExt |%s| ", queryExt);
 					tmpLogger (tmp_buffer);
 
 					sql_cmd_base = " SELECT ";
