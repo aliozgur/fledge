@@ -1824,6 +1824,8 @@ bool Connection::jsonAggregates(const Value& payload,
 				bool isExtQuery
 				)
 {
+	string col;
+
 	if (aggregates.IsObject())
 	{
 		if (! aggregates.HasMember("operation"))
@@ -1857,18 +1859,11 @@ bool Connection::jsonAggregates(const Value& payload,
 		sql.append('(');
 		if (aggregates.HasMember("column"))
 		{
-			string col = aggregates["column"].GetString();
+			col = aggregates["column"].GetString();
 			if (col.compare("*") == 0)	// Faster to count ROWID rather than *
 			{
-				if (isTableReading)
-				{
-					if (isExtQuery)
-						sql.append("ROWID_EXT");
-					else
-						sql.append("ROWID");
-				}
-				else
-					sql.append("ROWID");
+				col = "ROWID";
+				sql.append(col);
 			}
 			else
 			{
@@ -1978,12 +1973,13 @@ bool Connection::jsonAggregates(const Value& payload,
 		sql.append(") AS \"");
 		if (aggregates.HasMember("alias"))
 		{
+			// FIXME_I:
 			if (isTableReading)
 			{
 				if (isExtQuery)
 					sql.append(aggregates["alias"].GetString());
 				else
-					sql.append("ROWID_EXT");
+					sql.append(col);
 			}
 			else
 				sql.append(aggregates["alias"].GetString());
