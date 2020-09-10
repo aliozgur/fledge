@@ -1339,13 +1339,15 @@ string modifierInt;
 
 					sql_cmd_base = " SELECT ";
 					sql_cmd_base += queryExt;
-					StringReplace (sql_cmd_base, "asset_code", " \"_assetcode_\" asset_code ");
+					sql_cmd_base += ", ROWID, id, asset_code, reading, user_ts, ts ";
+					StringReplaceAll (sql_cmd_base, "asset_code", " \"_assetcode_\" .assetcode. ");
 					sql_cmd_base += " FROM _dbname_._tablename_ ";
 				} else
 				{
 					sql_cmd_base = " SELECT ROWID, id, \"_assetcode_\" asset_code, reading, user_ts, ts  FROM _dbname_._tablename_ ";
 
 				}
+				//// FIXME_I:
 				sql_cmd_tmp = readCat->sqlConstructMultiDb(sql_cmd_base);
 				sql_cmd += sql_cmd_tmp;
 
@@ -3002,6 +3004,7 @@ string  ReadingsCatalogue::sqlConstructMultiDb(string &sqlCmdBase)
 			dbName = generateDbName(item.second.second);
 
 			StringReplaceAll (sqlCmdTmp, "_assetcode_", item.first);
+			StringReplaceAll (sqlCmdTmp, ".assetcode.", "asset_code");
 			StringReplaceAll (sqlCmdTmp, "_dbname_", dbName);
 			StringReplaceAll (sqlCmdTmp, "_tablename_", dbReadingsName);
 			sqlCmd += sqlCmdTmp;

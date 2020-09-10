@@ -1825,6 +1825,8 @@ bool Connection::jsonAggregates(const Value& payload,
 				)
 {
 	string col;
+	string column_name;
+
 
 	if (aggregates.IsObject())
 	{
@@ -2021,7 +2023,8 @@ bool Connection::jsonAggregates(const Value& payload,
 			sql.append('(');
 			if (itr->HasMember("column"))
 			{
-				string column_name= (*itr)["column"].GetString();
+				// FIXME_I:
+				column_name= (*itr)["column"].GetString();
 				if (isTableReading && (column_name.compare("user_ts") == 0) )
 				{
 					sql.append("strftime('" F_DATEH24_SEC "', user_ts, 'localtime') ");
@@ -2060,7 +2063,8 @@ bool Connection::jsonAggregates(const Value& payload,
 				}
 				// Use json_extract(field, '$.key1.key2') AS value
 				sql.append("json_extract(");
-				sql.append(json["column"].GetString());
+				column_name=json["column"].GetString();
+				sql.append(column_name);
 				sql.append(", '$.");
 
 				// JSON1 SQLite3 extension 'json_type' object check:
@@ -2109,7 +2113,21 @@ bool Connection::jsonAggregates(const Value& payload,
 			sql.append(") AS \"");
 			if (itr->HasMember("alias"))
 			{
-				sql.append((*itr)["alias"].GetString());
+
+//
+				// FIXME_I:
+				if (isTableReading)
+				{
+					if (isExtQuery)
+						sql.append((*itr)["alias"].GetString());
+					else
+						sql.append(column_name);
+				}
+				else
+					sql.append((*itr)["alias"].GetString());
+
+//
+
 			}
 			else
 			{
